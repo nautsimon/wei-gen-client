@@ -8,7 +8,6 @@ interface StepManagerProps {
   step: string;
   history: Message[];
   generated: string;
-  executeCall?: any;
 }
 
 interface GenerateButtonProps {
@@ -56,7 +55,6 @@ const StepManager: React.FC<StepManagerProps> = ({
   step,
   history,
   generated,
-  executeCall,
 }) => {
   const [isCode, setIsCode] = useState(true);
 
@@ -98,7 +96,7 @@ const StepManager: React.FC<StepManagerProps> = ({
           {isCode ? (
             <Generated generated={generated} />
           ) : (
-            <Chat history={history} />
+            <Chat history={history} step={step} />
           )}
         </>
       ) : (

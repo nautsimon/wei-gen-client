@@ -46,7 +46,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            uid: uid,
+            session_id: uid,
           }),
         });
       }
