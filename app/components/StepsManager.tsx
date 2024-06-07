@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { BASE_URL } from "../static/config";
 import StepManager from "./StepManager";
 import { Message } from "../static/types";
+import { useSession } from "../context/SessionContext";
 interface ActionButtonProps {
   description?: string;
   values?: string;
@@ -9,22 +9,22 @@ interface ActionButtonProps {
   isNew: boolean;
 }
 
-const DUMMY_MSGS: Message[]  = [
+const DUMMY_MSGS: Message[] = [
   {
-    "role": "system",
-    "content": "Session created with id: 12345"
+    role: "system",
+    content: "Session created with id: 12345",
   },
   {
-    "role": "user",
-    "content": "I want to create a new session"
+    role: "user",
+    content: "I want to create a new session",
   },
   {
-    "role": "assistant",
-    "content": "Sure, let me create a new session for you"
-  }
-]
+    role: "assistant",
+    content: "Sure, let me create a new session for you",
+  },
+];
 
-const DUMMY_GEN: string =`metadata:
+const DUMMY_GEN: string = `metadata:
 author: <User>
 info: Automated PCR Workflow for Lab Experiment
 version: 0.1
@@ -138,107 +138,11 @@ flowdef:
   dependencies:
     - Reading and Documenting Results
   id: step_<ULID_placeholder>
-`
-const ActionButton: React.FC<ActionButtonProps> = ({
-  description,
-  values,
-  uid,
-  isNew,
-}) => {
-  const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState<any>(null);
-
-  const handleClick = async () => {
-    if ((description === null && values === null) || uid === null) {
-      console.error("Description or values cannot be null");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      var res;
-      if (isNew) {
-        res = await fetch(BASE_URL + "/session/init", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_description: description,
-            user_values: values,
-          }),
-        });
-      } else {
-        res = await fetch(BASE_URL + "/session/init", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            uid: uid,
-          }),
-        });
-      }
-      const data = await res.json();
-      setResponse(data);
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div>
-      <button
-        onClick={handleClick}
-        className="bg-blue-500 text-white p-2 rounded"
-        disabled={loading}
-      >
-        {loading ? "Loading..." : (isNew ? "Create Session"  : "Load Session")}
-      </button>
-      {response && <div className="mt-4">{JSON.stringify(response)}</div>}
-    </div>
-  );
-};
-
-
-// New components for the additional views
-const Framework = () => (
-  <div>
-    <h2 className="text-xl mb-4">Framework</h2>
-    <p>This is the Framework view.</p>
-    {/* Add your Framework view content here */}
-  </div>
-);
-
-const Workflow = () => (
-  <div>
-    <h2 className="text-xl mb-4">Workflow</h2>
-    <p>This is the Workflow view.</p>
-    {/* Add your Workflow view content here */}
-  </div>
-);
-
-const Code = () => (
-  <div>
-    <h2 className="text-xl mb-4">Code</h2>
-    <p>This is the Code view.</p>
-    {/* Add your Code view content here */}
-  </div>
-);
-
-const Config = () => (
-  <div>
-    <h2 className="text-xl mb-4">Config</h2>
-    <p>This is the Config view.</p>
-    {/* Add your Config view content here */}
-  </div>
-);
+`;
 
 const StepsManager = () => {
   const [activeTab, setActiveTab] = useState("framework");
-
+  const { session } = useSession();
   return (
     <div className="p-4 pt-12">
       <nav className="mb-4">
@@ -252,6 +156,7 @@ const StepsManager = () => {
         </button>
         <button
           onClick={() => setActiveTab("workflow")}
+          disabled={!session?.generated_framework || session?.generated_framework.length === 0}
           className={`px-4 py-2 ml-2 rounded ${
             activeTab === "workflow" ? "bg-blue-500 text-white" : "bg-gray-200"
           }`}
@@ -260,6 +165,7 @@ const StepsManager = () => {
         </button>
         <button
           onClick={() => setActiveTab("code")}
+          disabled={!session?.generated_workflow || session?.generated_workflow.length === 0}
           className={`px-4 py-2 ml-2 rounded ${
             activeTab === "code" ? "bg-blue-500 text-white" : "bg-gray-200"
           }`}
@@ -268,6 +174,7 @@ const StepsManager = () => {
         </button>
         <button
           onClick={() => setActiveTab("config")}
+          disabled={!session?.generated_code || session?.generated_code.length === 0}
           className={`px-4 py-2 ml-2 rounded ${
             activeTab === "config" ? "bg-blue-500 text-white" : "bg-gray-200"
           }`}
@@ -277,11 +184,34 @@ const StepsManager = () => {
       </nav>
 
       <div className="">
-
-        {activeTab === "framework" && <StepManager step="framework" generated={DUMMY_GEN}  history={DUMMY_MSGS}/>}
-        {activeTab === "workflow" && <StepManager step="workflow" generated={DUMMY_GEN}  history={DUMMY_MSGS}/>}
-        {activeTab === "code" && <StepManager step="code" generated={DUMMY_GEN} history={DUMMY_MSGS}/>}
-        {activeTab === "config" && <StepManager step="config" generated={DUMMY_GEN}  history={DUMMY_MSGS}/>}
+        {activeTab === "framework" && (
+          <StepManager
+            step="framework"
+            generated={session?.generated_framework}
+            history={session?.framework_agent_ctx}
+          />
+        )}
+        {activeTab === "workflow" && (
+          <StepManager
+            step="workflow"
+            generated={session?.generated_workflow}
+            history={session?.workflow_agent_ctx}
+          />
+        )}
+        {activeTab === "code" && (
+          <StepManager
+            step="code"
+            generated={session?.generated_code}
+            history={session?.code_agent_ctx}
+          />
+        )}
+        {activeTab === "config" && (
+          <StepManager
+            step="config"
+            generated={session?.generated_config}
+            history={session?.config_agent_ctx}
+          />
+        )}
       </div>
     </div>
   );

@@ -3,3 +3,6 @@ export interface Message {
     content: string;
   }
   
+export interface ParentProps {
+    updateSession: (session: any) => void;
+  }

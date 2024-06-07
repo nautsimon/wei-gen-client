@@ -1,15 +1,19 @@
 import React from "react";
+import { useSession } from '../context/SessionContext';
 
 interface SessionUIDProps {
   uid: string;
 }
 
-const SessionUID: React.FC<SessionUIDProps> = ({ uid }) => {
+const SessionUID = () => {
+  const { session } = useSession();
+  const uid = session?.session_id;
+  console.log("SSS", uid)
   return (
     <div className="w-full  mb-1">
       <h1 className="title">[session id: {" "}
-      {uid.length === 0 ? (
-        <i>no weigen session loaded, load or create a new session above</i>
+      {!uid || uid.length === 0 ? (
+        <i>~ no weigen session loaded, load or create a new session below ~</i>
       ) : (
         <u>{uid}</u>
       )}

@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { BASE_URL } from "../static/config";
+import {ParentProps} from "../static/types";
+import { useSession } from '../context/SessionContext';
+
 interface ActionButtonProps {
   description?: string;
   values?: string;
   uid?: string;
   isNew: boolean;
 }
+
 
 const ActionButton: React.FC<ActionButtonProps> = ({
   description,
@@ -14,8 +18,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   isNew,
 }) => {
   const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState<any>(null);
-
+  const { setSession } = useSession();
   const handleClick = async () => {
     if ((description === null && values === null) || uid === null) {
       console.error("Description or values cannot be null");
@@ -48,7 +51,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         });
       }
       const data = await res.json();
-      setResponse(data);
+      setSession(data.message);
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -57,21 +60,27 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center">
       <button
         onClick={handleClick}
-        className="bg-blue-500 text-white p-2 rounded"
+        className="bg-blue-500 text-white p-2 rounded w-fit"
         disabled={loading}
       >
         {loading ? "Loading..." : isNew ? "Create Session" : "Load Session"}
       </button>
-      {response && <div className="mt-4">{JSON.stringify(response)}</div>}
+      <div className="w-full center-text">
+      {loading && <i>(this will take 30 - 60 seconds)</i>}
+      </div>
     </div>
   );
 };
 
 const LoadSession = () => {
   const [uid, setUID] = useState<string>("");
+  const { session } = useSession();
+  useEffect(() => {
+    setUID(session?.session_id || uid);
+  }, [session]);
 
   const handleUIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUID(e.target.value);
@@ -93,7 +102,7 @@ const LoadSession = () => {
       </div>
       <div className="flex justify-center w-full">
         <ActionButton uid={uid} isNew={false} />
-      </div>{" "}
+      </div>
     </div>
   );
 };
@@ -167,7 +176,7 @@ const SessionManager = () => {
       </nav>
 
       <div className="">
-        {activeTab === "load" && <LoadSession />}
+        {activeTab === "load" && <LoadSession/>}
         {activeTab === "new" && <NewSession />}
       </div>
     </div>
