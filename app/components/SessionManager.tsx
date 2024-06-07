@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BASE_URL } from "../config/config";
+import { BASE_URL } from "../static/config";
 interface ActionButtonProps {
   description?: string;
   values?: string;
@@ -55,8 +55,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
       setLoading(false);
     }
   };
-//   const buttonLabel = ;
-// console.log("sssbuttonLabel);
+
   return (
     <div>
       <button
@@ -64,14 +63,13 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         className="bg-blue-500 text-white p-2 rounded"
         disabled={loading}
       >
-        {loading ? "Loading..." : (isNew ? "Create Session"  : "Load Session")}
+        {loading ? "Loading..." : isNew ? "Create Session" : "Load Session"}
       </button>
       {response && <div className="mt-4">{JSON.stringify(response)}</div>}
     </div>
   );
 };
 
-// Define the LoadSession component
 const LoadSession = () => {
   const [uid, setUID] = useState<string>("");
 
@@ -81,7 +79,6 @@ const LoadSession = () => {
 
   return (
     <div>
-      <h2 className="text-xl mb-4">Load Session</h2>
       <div className="flex w-full">
         <div className="w-full py-2">
           <p>Enter your UID below</p>
@@ -94,7 +91,9 @@ const LoadSession = () => {
           />
         </div>
       </div>
-      <ActionButton uid={uid} isNew={false} />
+      <div className="flex justify-center w-full">
+        <ActionButton uid={uid} isNew={false} />
+      </div>{" "}
     </div>
   );
 };
@@ -114,7 +113,6 @@ const NewSession = () => {
 
   return (
     <div>
-      <h2 className="text-xl mb-4">New Session</h2>
       {/* Your New Session content here */}
       <div className="flex w-fill">
         <div className="w-1/2 py-2">
@@ -136,17 +134,19 @@ const NewSession = () => {
           />
         </div>
       </div>
-      <ActionButton description={description} values={values} isNew={true}/>
+      <div className="flex justify-center w-full">
+        <ActionButton description={description} values={values} isNew={true} />
+      </div>
     </div>
   );
 };
 
 // Main component that switches between LoadSession and NewSession
 const SessionManager = () => {
-  const [activeTab, setActiveTab] = useState("new");
+  const [activeTab, setActiveTab] = useState("load");
 
   return (
-    <div className="p-4">
+    <div className="p-4  py-10">
       <nav className="mb-4">
         <button
           onClick={() => setActiveTab("new")}

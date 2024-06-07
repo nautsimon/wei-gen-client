@@ -2,7 +2,7 @@ import Image from "next/image";
 
 const Header = () => {
   return (
-    <header className="w-full  py-12">
+    <header className="w-full py-12">
       <div className=" mx-auto flex flex-col items-center">
         <div className="flex space-x-4">
           <Image
