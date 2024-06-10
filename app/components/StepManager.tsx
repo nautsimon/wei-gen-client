@@ -14,6 +14,13 @@ interface GenerateButtonProps {
   step: string;
 }
 
+const step_to_language: Record<string, string> = {
+  "framework": "md",
+  "workflow": "yaml",
+  "code": "py",
+  "config": "yaml",
+};
+
 const GenerateButton: React.FC<GenerateButtonProps> = ({ step }) => {
   const [loading, setLoading] = useState(false);
   const { session, setSession } = useSession();
@@ -94,7 +101,7 @@ const StepManager: React.FC<StepManagerProps> = ({
           </div>
 
           {isCode ? (
-            <Generated generated={generated} />
+            <Generated generated={generated} step={step} file_ext={step_to_language?.[step]}/>
           ) : (
             <Chat history={history} step={step} />
           )}

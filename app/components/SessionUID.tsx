@@ -1,10 +1,6 @@
 import React from "react";
 import { useSession } from '../context/SessionContext';
 
-interface SessionUIDProps {
-  uid: string;
-}
-
 const SessionUID = () => {
   const { session } = useSession();
   const uid = session?.session_id;

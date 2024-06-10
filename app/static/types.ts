@@ -6,3 +6,4 @@ export interface Message {
 export interface ParentProps {
     updateSession: (session: any) => void;
   }
+

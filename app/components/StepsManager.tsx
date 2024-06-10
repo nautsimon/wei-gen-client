@@ -13,40 +13,44 @@ interface ActionButtonProps {
 const StepsManager = () => {
   const [activeTab, setActiveTab] = useState("framework");
   const { session } = useSession();
+
+  const isDisabled = (step: string) => {
+    return !session?.["generated_"+step] || session?.["generated_"+step].length === 0
+  }
   return (
     <div className="p-4 pt-12">
       <nav className="mb-4">
         <button
           onClick={() => setActiveTab("framework")}
           className={`px-4 py-2 rounded ${
-            activeTab === "framework" ? "bg-blue-500 text-white" : "bg-gray-200"
+            activeTab === "framework" ? "bg-blue-500 text-white" : "bg-gray-200 hover:bg-gray-300"
           }`}
         >
           Framework
         </button>
         <button
           onClick={() => setActiveTab("workflow")}
-          disabled={!session?.generated_framework || session?.generated_framework.length === 0}
+          disabled={isDisabled("framework")}
           className={`px-4 py-2 ml-2 rounded ${
-            activeTab === "workflow" ? "bg-blue-500 text-white" : "bg-gray-200"
+            activeTab === "workflow" ? "bg-blue-500 text-white" : isDisabled("framework") ? "bg-gray-200" : "bg-gray-200 hover:bg-gray-300"
           }`}
         >
           Workflow
         </button>
         <button
           onClick={() => setActiveTab("code")}
-          disabled={!session?.generated_workflow || session?.generated_workflow.length === 0}
+          disabled={isDisabled("workflow")}
           className={`px-4 py-2 ml-2 rounded ${
-            activeTab === "code" ? "bg-blue-500 text-white" : "bg-gray-200"
+            activeTab === "code" ? "bg-blue-500 text-white" : isDisabled("workflow") ? "bg-gray-200" : "bg-gray-200 hover:bg-gray-300"
           }`}
         >
           Code
         </button>
         <button
           onClick={() => setActiveTab("config")}
-          disabled={!session?.generated_code || session?.generated_code.length === 0}
+          disabled={isDisabled("code")}
           className={`px-4 py-2 ml-2 rounded ${
-            activeTab === "config" ? "bg-blue-500 text-white" : "bg-gray-200"
+            activeTab === "config" ? "bg-blue-500 text-white" : isDisabled("code") ? "bg-gray-200" : "bg-gray-200 hover:bg-gray-300"
           }`}
         >
           Config
